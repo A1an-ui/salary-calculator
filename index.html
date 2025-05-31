@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>牛马的窝囊费计算器</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .motivation {
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        .gif-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        #tripleBtn {
+            background-color: #ff9800;
+            margin-top: 15px;
+        }
+        #tripleBtn:hover {
+            background-color: #e68a00;
+        }
+        .complaint {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-left: 5px solid #ff9800;
+            font-weight: bold;
+            color: #e65100;
+            display: none;
+            border-radius: 5px;
+        }
+        .angry-gif {
+            max-width: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .sarcastic-comment {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            font-style: italic;
+            color: #555;
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .life-burden {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .life-burden img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .rotating-comments {
+            margin: 20px 0;
+            min-height: 80px;
+            position: relative;
+        }
+        .rotating-comment {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s;
+            font-size: 0.9em;
+            color: #d32f2f;
+        }
+        .rotating-comment.active {
+            opacity: 1;
+        }
+        /* 新增的窝囊费显示样式 */
+        .earnings-display {
+            font-size: 1.5em;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .earnings-amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #f44336;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        .time-worked {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>牛马的窝囊费计算器</h1>
+        
+        <div id="inputForm">
+            <div class="form-group">
+                <label>月薪金额（元）：</label>
+                <input type="number" id="salary" required>
+                <div id="salaryError" class="error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>每月满勤天数：</label>
+                <select id="workDays" required>
+                    <script>
+                        for(let i = 1; i <= 31; i++) {
+                            document.write(`<option value="${i}">${i}天</option>`);
+                        }
+                    </script>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>每天工作时间（小时）：</label>
+                <select id="workHours" required>
+                    <script>
+                        for(let i = 1; i <= 24; i++) {
+                            document.write(`<option value="${i}">${i}小时</option>`);
+                        }
+                    </script>
+                </select>
+            </div>
+            
+            <button id="calculateBtn">确认</button>
+            <button id="resetBtn">重置</button>
+        </div>
+
+        <div id="result">
+            <h2>计算结果</h2>
+            
+            <div class="earnings-display">
+                <div class="time-worked" id="timeWorked"></div>
+                <div>已赚取窝囊费：<span class="earnings-amount" id="moneyEarned"></span></div>
+            </div>
+            
+            <div class="rotating-comments">
+                <div class="rotating-comment">"这点钱...孩子的补习班费还差38.7%"</div>
+                <div class="rotating-comment">"老婆的面膜只剩最后一片了"</div>
+                <div class="rotating-comment">"下月房贷...看着有希望了？"</div>
+                <div class="rotating-comment">"老板的新车真好看，是你的300倍工资"</div>
+            </div>
+            
+            <div class="life-burden">
+                <img src="https://media.giphy.com/media/l0HU5sZxOQPD5JJwc/giphy.gif" alt="房贷">
+                <span>本月房贷进度：<span id="mortgageProgress">0</span>%</span>
+            </div>
+            
+            <div class="life-burden">
+                <img src="https://media.giphy.com/media/3o7TKsQq0qXlBPvI8g/giphy.gif" alt="孩子教育">
+                <span>孩子补习班：还差<span id="tuitionProgress">0</span>元</span>
+            </div>
+            
+            <button id="tripleBtn">申请三倍窝囊费</button>
+            <div id="complaint" class="complaint">
+                <p>NO！现代化的牛马不需要三倍加班费！</p>
+                <p>老板说：能给你工作就是福报，要什么自行车！</p>
+                <p>HR补充：我们这是弹性工作制（指你的脊椎会变得很有弹性）</p>
+                <img src="https://media.giphy.com/media/l0HU7JI7S1j4Yx5Ms/giphy.gif" alt="愤怒打工人" class="angry-gif">
+            </div>
+            
+            <div class="sarcastic-comment" id="randomComment">
+                <!-- 这里会随机显示吐槽 -->
+            </div>
+            
+            <div class="motivation">
+                <p>加油！每一秒都在创造价值！</p>
+                <p>坚持就是胜利，努力终有回报！</p>
+            </div>
+            
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="加油动图">
+            </div>
+            
+            <button id="exitBtn">退出</button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let startTime;
+        let salaryPerSecond;
+        let timer;
+        let commentTimer;
+        let mortgageAmount = 8000; // 假设房贷8000
+        let tuitionAmount = 3000;  // 假设补习班费3000
+
+        // 吐槽语录库
+        const complaints = [
+            "NO！现代化的牛马不需要三倍加班费！",
+            "老板说：能给你工作就是福报，要什么自行车！",
+            "HR补充：我们这是弹性工作制（指你的脊椎会变得很有弹性）",
+            "三倍？想得美！这是福报，要什么加班费！",
+            "年轻人不要总想着钱，要多想想怎么奉献！",
+            "老板的游艇还没换新的，你怎么好意思要三倍？",
+            "你的工资包含了对公司的热爱，怎么能用金钱衡量！",
+            "要三倍？那你先把上次团建吃的披萨钱AA了吧！",
+            "公司正在经历寒冬（虽然老板刚买了第三套房）",
+            "你的奋斗就是最好的回报（物理意义上的）"
+        ];
+
+        // 生活压力吐槽
+        const lifeComments = [
+            "还在算呢？马上要放假了，得报辅导班",
+            "老婆的面膜还有最后一片了",
+            "呦呵，下月房贷看着有希望了",
+            "这点钱...孩子的补习班费还差38.7%",
+            "老板的新车真好看，是你的300倍工资",
+            "这个月又能给房东贡献半个月工资了",
+            "加油！再干50年就能全款买房了",
+            "你的时薪比楼下奶茶店员工低2块",
+            "这点钱买泡面能买多少包？我算算...",
+            "恭喜！你的窝囊费已超过全国1%的牛马"
+        ];
+
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件监听器
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+            document.getElementById('exitBtn').addEventListener('click', exit);
+            document.getElementById('tripleBtn').addEventListener('click', showComplaint);
+            
+            // 初始化旋转评论
+            initRotatingComments();
+            
+            // 页面卸载时清理定时器
+            window.addEventListener('beforeunload', cleanup);
+        });
+
+        function calculate() {
+            // 获取输入值
+            const salaryInput = document.getElementById('salary').value;
+            const workDays = parseInt(document.getElementById('workDays').value, 10);
+            const workHours = parseInt(document.getElementById('workHours').value, 10);
+            
+            // 验证输入
+            const salaryError = document.getElementById('salaryError');
+            salaryError.textContent = '';
+            
+            if (!salaryInput) {
+                salaryError.textContent = "请输入月薪金额";
+                return;
+            }
+            
+            const salary = parseFloat(salaryInput);
+            if (isNaN(salary) || salary <= 0) {
+                salaryError.textContent = "请输入有效的正数金额";
+                return;
+            }
+            
+            if (workDays <= 0 || workHours <= 0) {
+                alert("工作天数和工作时间必须大于零");
+                return;
+            }
+            
+            // 计算每秒工资
+            salaryPerSecond = salary / workDays / workHours / 3600;
+            
+            // 切换UI显示
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('complaint').style.display = 'none';
+            
+            // 开始计时
+            startTime = new Date();
+            updateDisplay();
+            
+            // 显示随机吐槽
+            showRandomComment();
+            
+            // 设置定时器
+            cleanup();
+            timer = setInterval(updateDisplay, 1000);
+            commentTimer = setInterval(showRandomComment, 8000);
+        }
+
+        function updateDisplay() {
+            const now = new Date();
+            const diff = (now - startTime) / 1000; // 精确到毫秒
+            
+            const hours = Math.floor(diff / 3600);
+            const minutes = Math.floor((diff % 3600) / 60);
+            const seconds = Math.floor(diff % 60);
+            
+            // 计算赚取的金额
+            const moneyEarned = salaryPerSecond * diff;
+            
+            // 更新显示
+            document.getElementById('timeWorked').textContent = 
+                `已工作：${hours}小时 ${minutes}分钟 ${seconds}秒`;
+            document.getElementById('moneyEarned').textContent = 
+                moneyEarned.toLocaleString('zh-CN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + "元";
+            
+            // 更新生活压力进度
+            updateLifeBurden(moneyEarned);
+        }
+
+        function updateLifeBurden(moneyEarned) {
+            // 房贷进度
+            const mortgageProgress = Math.min(100, (moneyEarned / mortgageAmount * 100).toFixed(1));
+            document.getElementById('mortgageProgress').textContent = mortgageProgress;
+            
+            // 补习班费差额
+            const tuitionNeeded = Math.max(0, tuitionAmount - moneyEarned).toFixed(2);
+            document.getElementById('tuitionProgress').textContent = tuitionNeeded;
+        }
+
+        function showComplaint() {
+            const complaintBox = document.getElementById('complaint');
+            const complaintLines = complaintBox.querySelectorAll('p');
+            
+            // 随机选择3条不同的吐槽
+            const shuffled = [...complaints].sort(() => 0.5 - Math.random());
+            
+            // 更新吐槽内容
+            complaintLines[0].textContent = shuffled[0];
+            complaintLines[1].textContent = shuffled[1];
+            complaintLines[2].textContent = shuffled[2];
+            
+            // 显示吐槽框
+            complaintBox.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                complaintBox.style.display = 'none';
+            }, 5000);
+        }
+
+        function showRandomComment() {
+            const commentBox = document.getElementById('randomComment');
+            const randomIndex = Math.floor(Math.random() * lifeComments.length);
+            commentBox.textContent = `"${lifeComments[randomIndex]}"`;
+        }
+
+        function initRotatingComments() {
+            const comments = document.querySelectorAll('.rotating-comment');
+            let current = 0;
+            
+            // 显示第一个评论
+            comments[current].classList.add('active');
+            
+            // 设置轮换
+            setInterval(() => {
+                comments[current].classList.remove('active');
+                current = (current + 1) % comments.length;
+                comments[current].classList.add('active');
+            }, 3000);
+        }
+
+        function reset() {
+            document.getElementById('salary').value = '';
+            document.getElementById('salaryError').textContent = '';
+            document.getElementById('workDays').selectedIndex = 0;
+            document.getElementById('workHours').selectedIndex = 0;
+        }
+
+        function exit() {
+            cleanup();
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('inputForm').style.display = 'block';
+            document.getElementById('complaint').style.display = 'none';
+            reset();
+        }
+        
+        function cleanup() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            if (commentTimer) {
+                clearInterval(commentTimer);
+                commentTimer = null;
+            }
+        }
+    </script>
+</body>
+</html>
